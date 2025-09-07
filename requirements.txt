@@ -1,0 +1,4 @@
+# requirements.txt
+flask
+google-generativeai
+python-dotenv

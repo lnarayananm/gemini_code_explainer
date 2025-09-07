@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini Code Explainer</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        textarea { width: 100%; max-width: 800px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        pre { background-color: #f4f4f4; padding: 15px; border-left: 5px solid #007bff; white-space: pre-wrap; word-wrap: break-word; max-width: 800px; }
+        #explanation { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>Gemini-Assisted Code Explainer</h1>
+    <form id="codeForm">
+        <label for="code_input">Enter your code here:</label><br>
+        <textarea id="code_input" name="code" rows="15" placeholder="Paste your code here and click 'Explain Code'..."></textarea><br><br>
+        <button type="submit">Explain Code</button>
+    </form>
+    <h2>Explanation:</h2>
+    <pre id="explanation">Your explanation will appear here.</pre>
+
+    <script>
+        document.getElementById('codeForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const code = document.getElementById('code_input').value;
+            const explanationDiv = document.getElementById('explanation');
+
+            if (!code.trim()) {
+                explanationDiv.textContent = 'Please enter some code to explain.';
+                return;
+            }
+
+            explanationDiv.textContent = 'Explaining code... Please wait.';
+
+            try {
+                const response = await fetch('/explain', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    explanationDiv.textContent = data.explanation;
+                } else {
+                    explanationDiv.textContent = `Error: ${data.error || 'Something went wrong.'}`;
+                }
+            } catch (error) {
+                explanationDiv.textContent = `Network error: ${error.message}. Make sure your Flask server is running on port 5001.`;
+                console.error('Fetch error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
